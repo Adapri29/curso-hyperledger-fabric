@@ -23,11 +23,6 @@ func (s *SmartContract) Set(ctx contractapi.TransactionContextInterface, foodId 
 
 	// Validaciones de negocio
 
-	food, err := s.Query(ctx, foodId)
-	if err == nil && food != nil {
-		return fmt.Errorf("food already exists")
-	}
-
 	newFood := Food{
 		Farmer:  farmer,
 		Variety: variety,
