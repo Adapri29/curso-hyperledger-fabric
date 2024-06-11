@@ -486,7 +486,7 @@ En este caso solo las primera y tercera organizacion van a tener permisos de esc
   
   Ejecutamos el caso de Set.
 
-      peer chaincode invoke -o orderer.fiuba.com:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set","did:3","ricardo","banana","555","Fisica","true"]}'
+      peer chaincode invoke -o orderer.fiuba.com:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set","did:3","ricardo","banana"]}'
 
   Corroboramos en la base de datos:
 
@@ -497,4 +497,9 @@ En este caso solo las primera y tercera organizacion van a tener permisos de esc
   Ejecutamos el caso de Query.
 
       peer chaincode invoke -o orderer.fiuba.com:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Query","did:3"]}'
+
+* Intentar ejecutar en la org2 (dara error porque no tiene permiso de escritura)
+
+
+      CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.fiuba.com/users/Admin@org2.fiuba.com/msp CORE_PEER_ADDRESS=peer0.org2.fiuba.com:7051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.fiuba.com/peers/peer0.org2.fiuba.com/tls/ca.crt peer chaincode invoke -o orderer.fiuba.com:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set","did:3","ricardo","banana"]}'
 
