@@ -1,4 +1,4 @@
-module github.com/salosmc/BlockChain-con-Hyperledger-Fabric---CETEC/chaincode/foodcontrol
+module github.com/Adapri29/curso-hyperledger-fabric/chaincode/foodcontrol
 
 go 1.13
 
