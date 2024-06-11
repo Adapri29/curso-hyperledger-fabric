@@ -338,6 +338,9 @@ Para eso creamos primero un volumen
 
 ### Terminamos de configurar la red
 
+* Entramos en el contenedor CLI
+docker exec -it <nombre_del_contenedor_o_ID_del_contenedor> /bin/bash 
+
 * Creamos el canal "attendance". Nos conectamos a la consola de comando del contenedor CLI.
 
       -export CHANNEL_NAME=attendance
@@ -348,7 +351,7 @@ Para eso creamos primero un volumen
 
 * Añadimos la primer organizacion al canal que toma por defecto CLI.
 
-      -peer channel join -b attendance.block
+      -peer channel join -b attendance.block #Como CLI usa la identidad del peer0.org1, no necesito especificar quien soy yo
 
 * Añadimos la segunda organización al canal
 
@@ -391,41 +394,18 @@ Lo idea seria llamarlo alumnoControl y volver a generar todas las configuracione
 
 > ### Datos que se van a persisitir
 >
->     type Alumno struct {
->	    Nombre string `json:"nombre"`
->	    Apellido string `json:"apellido"`
->	    Padron int `json:"padron"`
->	    Materia string `json:"materia"`
->	    Asistencia bool `json:"asistencia"`
->     }
+>     type Food struct {
+	Farmer  string `json:"farmer"`
+	Variety string `json:"variety"`
+      }
 
-> ### Metodos necesarios
->
->     func (s *SmartContract) Set(ctx contractapi.TransactionContextInterface,
->        alumnoId string,
->        nombre string,
->        apellido string,
->        padron int ,
->        materia string,
->        asistencia bool)
->      error
->     func (s *SmartContract) Query(ctx contractapi.TransactionContextInterface,
->       alumnoId string)
->     (*Alumno, error)
 
-> ### Main
->
->     func main() {
->       chaincode, err := contractapi.NewChaincode(new(SmartContract))
->       if err != nil {
->   		fmt.Printf("Error create foodcontrol chaincode: %s", err.Error())
->   		return
->   	}
->   	if err := chaincode.Start(); err != nil {
->   		fmt.Printf("Error starting foodcontrol chaincode: %s", err.Error())
->   	}
->     }
+### Añadimos las dependencias de go
+       
+      go mod tidy
 
+
+      go mod download
 
 [ver archivo foodcontrol.go](./chaincode/foodcontrol/foodcontrol.go)
 
@@ -472,16 +452,16 @@ Ahora nos conectamos al servicio de CLI ejecutamos las siguientes lineas.
 
     Observar que los identificadores deben ser los mismos.
 
-* Definimos las politicas de aprobación para el chaincode, aca es donde decidimos que organizaciones tienen permisos para firmar transacciones.
+* Definimos las politicas de aprobación para el chaincode, aqui es donde decidimos que organizaciones tienen permisos para firmar transacciones.
 En este caso solo las primera y tercera organizacion van a tener permisos de escritura.
    
    Para la primer organización.
 
-      peer lifecycle chaincode approveformyorg --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --version $CHAINCODE_VERSION --sequence 1 --waitForEvent --signature-policy "OR ('Org1MSP.peer','Org3MSP.peer')" --package-id foodcontrol_1:d7dcb74d448855c2b545033b3c985f92c245642198f61283dadfa24c4204f32b
+      peer lifecycle chaincode approveformyorg --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --version $CHAINCODE_VERSION --sequence 1 --waitForEvent --signature-policy "OR ('Org1MSP.peer','Org3MSP.peer')" --package-id foodcontrol_1:<smart contract>
 
    Para la tercer organización.
 
-      CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.fiuba.com/users/Admin@org3.fiuba.com/msp CORE_PEER_ADDRESS=peer0.org3.fiuba.com:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.fiuba.com/peers/peer0.org3.fiuba.com/tls/ca.crt peer lifecycle chaincode approveformyorg --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --version $CHAINCODE_VERSION --sequence 1 --waitForEvent --signature-policy "OR ('Org1MSP.peer','Org3MSP.peer')" --package-id foodcontrol_1:d7dcb74d448855c2b545033b3c985f92c245642198f61283dadfa24c4204f32b
+      CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.fiuba.com/users/Admin@org3.fiuba.com/msp CORE_PEER_ADDRESS=peer0.org3.fiuba.com:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.fiuba.com/peers/peer0.org3.fiuba.com/tls/ca.crt peer lifecycle chaincode approveformyorg --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --version $CHAINCODE_VERSION --sequence 1 --waitForEvent --signature-policy "OR ('Org1MSP.peer','Org3MSP.peer')" --package-id foodcontrol_1:<smart contract>
 
    Comprobamos que las politicas esten correctas, ejecutando la siguiente linea de comando:
       
